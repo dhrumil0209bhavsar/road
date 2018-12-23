@@ -1,5 +1,5 @@
 constants = {
-    HOST: "http://192.168.43.149:3003/",
+    HOST: "https://roadgrievance.herokuapp.com/",
     SECRET_KEY: 's9iIk0llo06TgfrTFDrfvHFKJbJBbvftrdFYT',
     //mongoDBURL: 'mongodb://localhost:27017/roadGrievanceDB',
     // mongoDBURL: 'mongodb://road:roadserver2@ds131313.mlab.com:31313/roadb',
