@@ -1,0 +1,38 @@
+//Query on array of nested documents
+
+//final filters
+db.officers.aggregate([
+    { $match: { _id: ObjectId("5ba4933663707b1cf60f68e8") } },
+    { $unwind: "$complaints" },
+    { $match: { "complaints.complaint_status": "Pending" } }
+]);
+
+db.Users.find({
+    _id: ObjectId("5ba0bca7864f281a8fbd7bba")
+},
+{
+    roadComplaints: {
+        $elemMatch: {
+            _id: "kjsd9rwejlfi"
+        }
+    }
+})
+
+//user token
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YmE0YTRlZDg3MjFmOTI0MGQ3OWE4ZjUiLCJuYW1lIjoiS2F1c2hpayBKYWRhdiIsImVtYWlsIjoia2F1c2hpa2phZGF2NjAyQGN1dm94LmRlIiwicGhvbmVObyI6Ijk4NzY1NDMyMTAiLCJpYXQiOjE1Mzc1MTcwMTB9.XQtfyG6czVqXEmT7S6udTBur7mWLos3_ECoI3v7siss
+
+
+//find complaint by it's fields
+db.officers.find(
+{
+    _id: ObjectId("5ba4933663707b1cf60f68e8"),
+},
+{
+    complaints: {
+        $elemMatch: {
+            complaint_status: "Pending"
+        }
+    }
+})
+
+
