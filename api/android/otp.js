@@ -1,6 +1,8 @@
 //required imports
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const ejs = require('ejs');
+const Nexmo = require('nexmo');
 
 const db = require('../../db');
 //get the express router
@@ -10,6 +12,12 @@ const verify = require('../../middlewares/aurthorization').verify;
 //global constants
 const CONSTANTS = require('../../globals').constants;
 
+
+const nexmo = new Nexmo({
+    apiKey: 'd5b1bf5f',
+    apiSecret: 'JMG0uYB3gbm8PJVZ'
+  }, { debug: true });
+  
 
 async function findAndRemoveExistingPhoneEntry(phoneNo) {
     let query = db.Otp.deleteMany({ phoneNo: phoneNo });
@@ -33,8 +41,20 @@ router.post('/otp',async (req, res) => {
     await findAndRemoveExistingPhoneEntry(phoneNo);
 
     //generate otp here
-    let tempOtp = 1111;// Math.floor(Math.random() * (9999 - 1000 + 1) + 1000);
+    let tempOtp = 1111;//Math.floor(Math.random() * (9999 - 1000 + 1) + 1000);
     // console.log(tempOtp);
+
+
+
+    nexmo.message.sendSms(
+        '917984047414', phoneNo, "Your marg sahayak otp is " + tempOtp, { type: 'unicode' },
+        (err, responseData) => {
+          if(err) {
+            console.log(err);
+          } else {
+            console.log(responseData);
+          }
+    });
     
     //send otp here
     let otp = new db.Otp({

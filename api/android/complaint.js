@@ -47,8 +47,8 @@ router.post('/postNewComplaint', async (req, res) => {
         let roadCode = req.body.road_code;
         let name = req.body.name;
         let location = req.body.location;
-            let lat = parseFloat(location[1]);
-            let lon = parseFloat(location[0]);
+            let lat = parseFloat(location[0]);
+            let lon = parseFloat(location[1]);
         let description = req.body.description;
         let griev_type = req.body.griev_type;
         let url = CONSTANTS.HOST + "api/android/getImage?url=" + req.body.url;
@@ -65,7 +65,7 @@ router.post('/postNewComplaint', async (req, res) => {
         if(!userIsValid(userId)){
             res.json({ success: false, data: "User not found! please clear data of app" });
             return;
-        }
+        }       
 
         //creating new posted user
         let newPostedUser = new PostedUser({ userId: userId, url: url });
@@ -74,7 +74,7 @@ router.post('/postNewComplaint', async (req, res) => {
         let complaint = new db.RoadComplaint({
             road_code: roadCode,
             name: name,
-            location: [lat, lon],
+            location: [lon, lat],
             grievType: griev_type,
             description: description });
 
@@ -86,58 +86,156 @@ router.post('/postNewComplaint', async (req, res) => {
             res.json({ success: false, data: "No Officer found on given road" }); return; 
         }
 
-        //adding officer id in users.complaintOfficer
-
-        await db.User.updateOne(
-            { _id: userId },
-            { $addToSet: { "complaintOfficers": officerObjectId } })
-        .then(data =>{ 
-            if(data) { 
-                // console.log("officer id added to user.complaintOfficers")
-            } else { res.json({ success: false, data: "User does not exists, try clearing app data" }); return -1; }
-         })
-        .catch(err => { console.log(err); res.json({ success: false, data: "Something went wrong" }); return -1; });
-
-        //saving road complaint to officer
-        await db.Officer.updateOne(
-            { _id: officerObjectId }, //find officer document
-            { $push: { complaints: complaint }, //push new complaint in document
-              $inc: { newComplaints: 1 } }) //increament new complaint counter
-            .then(data => { 
-                // console.log("Complaint added to Officer's Complaints array"); 
-            })
-            .catch(err => { console.log(err); res.json({ success: false, data: "Something went wrong" }); return -1; });
-
-        //adding user id in complaint.postedUsers
-        await db.Officer.updateOne({ $and: [{ _id: officerObjectId },
-                { complaints: { $elemMatch: { "_id": complaint._id } } }] },
-                { $addToSet: { "complaints.$.postedUsers": newPostedUser } })
-            .then(data => { 
-                // console.log(1); 
-            })
-            .catch(err => { console.log(err); res.json({ success: false, data: "Something went wrong here" }); return -1;});
-
-        let officer = await getOfficerById(officerObjectId, { "name": 1, "email": 1 })
-        //send response to user
-        
-        let response = {
-            success: true,
-            _id: complaint._id,
-            url: newPostedUser.url,
-            location: complaint.location,
-            complaint_status: complaint.complaint_status,
-            comments: complaint.comments,
-            road_code: complaint.road_code,
-            name: complaint.name,
-            griev_type: complaint.grievType,
-            description: complaint.description,
-            officer_id: officerObjectId,
-            officer_email: officer.email,
-            officer_name: officer.name,
-            time: CONSTANTS.getFormatedDate(complaint.time)
+        function distance(lat1, lon1, lat2, lon2, unit) {
+            if ((lat1 == lat2) && (lon1 == lon2)) {
+                return 0;
+            }
+            else {
+                var radlat1 = Math.PI * lat1/180;
+                var radlat2 = Math.PI * lat2/180;
+                var theta = lon1-lon2;
+                var radtheta = Math.PI * theta/180;
+                var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+                if (dist > 1) {
+                    dist = 1;
+                }
+                dist = Math.acos(dist);
+                dist = dist * 180/Math.PI;
+                dist = dist * 60 * 1.1515;
+                if (unit=="K") { dist = dist * 1.609344 }
+                if (unit=="N") { dist = dist * 0.8684 }
+                return dist;
+            }
         }
-        await res.json(response);
-        //task after posting complaint (eg. notifications)
+
+        //duplicate complaints here
+        await db.Officer.findOne({ "_id": officerObjectId })
+            .then(async data => {
+                let officer = data
+                // let complaints = await data.complaints.map(item => {
+                //     return {
+                //         distance: distance(lat, lon, item.location[0], item.location[1], "K"),
+                //         ...item 
+                //     }
+                // })
+
+
+                // console.log("---------------------");
+                // console.log("distance added");
+                // console.log(complaints);
+                // console.log("---------------------");
+                
+
+                let complaints = await data.complaints.filter((item) => {
+                    console.log("---------------------");
+                    console.log(item.grievType == griev_type, item.grievType, griev_type,  item.complaint_status.toLowerCase() == "pending",  item.complaint_status.toLowerCase(), "pending", item.distance < CONSTANTS.MIN_RADIUS, distance(lat, lon, item.location[0], item.location[1], "K"), CONSTANTS.MIN_RADIUS);
+                    
+                    
+                    return item.complaint_status.toLowerCase() == "pending" && item.grievType == griev_type && (distance(lat, lon, item.location[0], item.location[1], "K") < CONSTANTS.MIN_RADIUS)
+                })
+
+                console.log("---------------------");
+                console.log("filtered");
+                console.log(complaints);
+                console.log("---------------------");
+
+                if(complaints.length > 1) {
+                    let sortedComplaints = await complaints.sort((a, b) => {
+                        return a.distance > b.distance
+                    })
+
+                    let finalComplaint = sortedComplaints[0]
+
+                    console.log("---------------------");
+                    console.log("final complaint");
+                    console.log(finalComplaint);
+                    console.log("---------------------");
+
+                    await db.Officer.updateOne({ $and: [{ _id: officerObjectId },
+                        { complaints: { $elemMatch: { "_id": finalComplaint._id } } }] },
+                        { $addToSet: { "complaints.$.postedUsers": newPostedUser } })
+                    .then(data => { 
+                        // console.log(1);
+                        let response = {
+                            success: true,
+                            _id: finalComplaint._id,
+                            url: newPostedUser.url,
+                            location: finalComplaint.location,
+                            complaint_status: finalComplaint.complaint_status,
+                            comments: finalComplaint.comments,
+                            road_code: finalComplaint.road_code,
+                            name: finalComplaint.name,
+                            griev_type: finalComplaint.grievType,
+                            description: finalComplaint.description,
+                            officer_id: officerObjectId,
+                            officer_email: officer.email,
+                            officer_name: officer.name,
+                            time: CONSTANTS.getFormatedDate(newPostedUser.time)
+                        }
+                        console.log("---------------------");
+                        console.log("response");
+                        console.log(response);
+                        console.log("---------------------");
+                        res.json(response); 
+                    })
+                    .catch(err => { console.log(err); res.json({ success: false, data: "Something went wrong here" }); return -1;});                    
+                } else  {
+                    //adding officer id in users.complaintOfficer
+                    await db.User.updateOne(
+                        { _id: userId },
+                        { $addToSet: { "complaintOfficers": officerObjectId } })
+                    .then(data =>{ 
+                        if(data) { 
+                            // console.log("officer id added to user.complaintOfficers")
+                        } else { res.json({ success: false, data: "User does not exists, try clearing app data" }); return -1; }
+                    })
+                    .catch(err => { console.log(err); res.json({ success: false, data: "Something went wrong" }); return -1; });
+
+                    //saving road complaint to officer
+                    await db.Officer.updateOne(
+                        { _id: officerObjectId }, //find officer document
+                        { $push: { complaints: complaint }, //push new complaint in document
+                        $inc: { newComplaints: 1 } }) //increament new complaint counter
+                        .then(data => { 
+                            // console.log("Complaint added to Officer's Complaints array"); 
+                        })
+                        .catch(err => { console.log(err); res.json({ success: false, data: "Something went wrong" }); return -1; });
+
+                    //adding user id in complaint.postedUsers
+                    await db.Officer.updateOne({ $and: [{ _id: officerObjectId },
+                            { complaints: { $elemMatch: { "_id": complaint._id } } }] },
+                            { $addToSet: { "complaints.$.postedUsers": newPostedUser } })
+                        .then(data => { 
+                            // console.log(1); 
+                        })
+                        .catch(err => { console.log(err); res.json({ success: false, data: "Something went wrong here" }); return -1;});
+
+                    //send response to user
+                    
+                    let response = {
+                        success: true,
+                        _id: complaint._id,
+                        url: newPostedUser.url,
+                        location: complaint.location,
+                        complaint_status: complaint.complaint_status,
+                        comments: complaint.comments,
+                        road_code: complaint.road_code,
+                        name: complaint.name,
+                        griev_type: complaint.grievType,
+                        description: complaint.description,
+                        officer_id: officerObjectId,
+                        officer_email: officer.email,
+                        officer_name: officer.name,
+                        time: CONSTANTS.getFormatedDate(complaint.time)
+                    }
+                    await res.json(response);
+                    //task after posting complaint (eg. notifications)
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                res.json({ success: false, data: "Something went wrong 123" }); return -1;
+            })
         
     } else {
         //Here Requiered parameter is not in request.body
