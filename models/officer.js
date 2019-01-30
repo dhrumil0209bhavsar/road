@@ -43,6 +43,18 @@ const officer = mongoose.Schema({
     newComplaints: {
         type: Number,
         default: 0
+    },
+    pending: {
+        type: Number,
+        default: 0
+    },
+    emergency: {
+        type: Number,
+        default: 0
+    },
+    completed: {
+        type: Number,
+        default: 0
     }
 
 }, {

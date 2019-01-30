@@ -35,75 +35,89 @@ router.post('/updateComplaint', async (req, res) => {
     
     console.log(comment);
     
-    
-
-    await db.Officer.findOneAndUpdate(
+    await db.Officer.findOne(
         { "_id": mongoose.Types.ObjectId(req.userData._id),
           "complaints._id": mongoose.Types.ObjectId(complaint_id) },
-        { 
-            $set: {
-                "complaints.$.isEmergency": isEmergency, 
-                "complaints.$.complaint_status": complaint_status,
-                "complaints.$.estimated_completion": estimated_completion,
-                "complaints.$.comments": (comment == null) ? []: [comment]
-            },
-            // $push: { "complaints.$.comments": comment }
+        {
+            "complaints.$[]": 1
         }
     )
-    .then(async data => {
-
-        await db.Officer.aggregate([
-            { "$match": { "_id": mongoose.Types.ObjectId(req.userData._id) } },
-            { "$unwind": "$complaints" },
-            { "$match": { "complaints._id":  mongoose.Types.ObjectId(complaint_id) } },
-            { "$project": { "complaints": 1 } }
-        ])
-            .then(async data => {
-                await data[0].complaints.postedUsers.forEach(async postedUser => {
-                    console.log(postedUser);                   
-                    let updatedUserComplaint = new db.UpdatedComplaint({
-                        _id: complaint_id,
-                        complaint_status: complaint_status,
-                        estimated_date: getFormatedDate(estimated_completion),
-                        comments: [comment],
-                        time: getFormatedDate(new Date()),
-                    })
-                    
-                    await db.User.updateOne(
-                        { "_id":  mongoose.Types.ObjectId(postedUser.userId) },
-                        { $addToSet: { "updatedComplaints": updatedUserComplaint } }
-                    )
-                    .then(data => {
-                        console.log(data);
-                    })
-                    .catch(err => {
-                        console.log(err);                        
-                        res.json({
-                            success: false,
-                            data: err
+    .then(async oldComplaint => {
+        await db.Officer.findOneAndUpdate(
+            { "_id": mongoose.Types.ObjectId(req.userData._id),
+              "complaints._id": mongoose.Types.ObjectId(complaint_id) },
+            { 
+                $set: {
+                    "complaints.$.isEmergency": isEmergency, 
+                    "complaints.$.complaint_status": complaint_status,
+                    "complaints.$.estimated_completion": estimated_completion,
+                    "complaints.$.comments": (comment == null) ? []: [comment],
+                },
+                // $push: { "complaints.$.comments": comment }
+                $inc: {
+                    [complaint_status]: 1,
+                    [oldComplaint.complaint_status]: -1
+                }
+            }
+        )
+        .then(async data => {
+    
+            await db.Officer.aggregate([
+                { "$match": { "_id": mongoose.Types.ObjectId(req.userData._id) } },
+                { "$unwind": "$complaints" },
+                { "$match": { "complaints._id":  mongoose.Types.ObjectId(complaint_id) } },
+                { "$project": { "complaints": 1 } }
+            ])
+                .then(async data => {
+                    await data[0].complaints.postedUsers.forEach(async postedUser => {
+                        console.log(postedUser);                   
+                        let updatedUserComplaint = new db.UpdatedComplaint({
+                            _id: complaint_id,
+                            complaint_status: complaint_status,
+                            estimated_date: getFormatedDate(estimated_completion),
+                            comments: [comment],
+                            time: getFormatedDate(new Date()),
+                        })
+                        
+                        await db.User.updateOne(
+                            { "_id":  mongoose.Types.ObjectId(postedUser.userId) },
+                            { $addToSet: { "updatedComplaints": updatedUserComplaint } }
+                        )
+                        .then(data => {
+                            console.log(data);
+                        })
+                        .catch(err => {
+                            console.log(err);                        
+                            res.json({
+                                success: false,
+                                data: err
+                            })
                         })
                     })
+    
+                    await res.json({
+                        success: true,
+                        data: "ok"
+                    })
+                    
                 })
-
-                await res.json({
-                    success: true,
-                    data: "ok"
+                .catch(err => {
+                    console.log(err);
+                    res.json({
+                        success: false,
+                        data: "Something went wrong"
+                    })                
                 })
-                
+        })
+        .catch(err => {
+            res.json({
+                success: false,
+                data: err.message
             })
-            .catch(err => {
-                console.log(err);
-                res.json({
-                    success: false,
-                    data: "Something went wrong"
-                })                
-            })
+        })
     })
     .catch(err => {
-        res.json({
-            success: false,
-            data: err.message
-        })
+
     })
 });
 

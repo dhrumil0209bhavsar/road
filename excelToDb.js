@@ -1,9 +1,9 @@
-// const db = require('./db');
-// const mongoose = require('mongoose');
-// const bcrypt = require('bcryptjs');
+const db = require('./db');
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 // const print = console.log;
-const testFolder = './direct/check/';
+const testFolder = './new_roads/07/check/';
 const fs = require('fs');
 let readXlsxFile = require('read-excel-file/node');
 
@@ -25,52 +25,19 @@ let EEobj               =   []
 let SeOobj              =   []
 let uniCode_RoadName    =   [];
 
-readXlsxFile(testFolder+"b1.xlsx")
-	.then(f1 => {
-		readXlsxFile(testFolder+"t1.xlsx")
-			.then(b1 => {
-
-				const headerf1 = {};
-				let if1=0;
-		
-				f1[0].forEach(e => {
-					headerf1[e] = if1;
-					if1++;
-				})
-				Object.freeze(headerf1);
-
-				const headerb1 = {};
-				let ib1=0;
-		
-				b1[0].forEach(e => {
-					headerb1[e] = ib1;
-					ib1++;
-				})
-				Object.freeze(headerb1);
-
-				for (i = 1; i < f1.length; i++){
-					if(f1[i][headerf1['Uniqe code']] === b1[i][headerb1['Uniqe code']]) {
-						console.log(true);
-					} else {
-						console.log(i);
-						break;
-					}
-				}				
-
-			})
-	})
-
-
 //for adding officer and road to db
 let mainFunction1 = () => {
 	return new Promise(async (resolve, reject) => {
 		setTimeout(() => {
-			resolve()
-		}, 40000)
+			console.log("resolved");
+			doAtEnd1();
+			resolve();
+		}, 30000)
 		await files.forEach((file, index, array) => {
 			readXlsxFile(testFolder+file)
 			.then((rows) => {
-					console.log(file, index);
+					// return
+					// console.log(file, index);
 					const header = {};
 					let i=0;
 			
@@ -79,6 +46,7 @@ let mainFunction1 = () => {
 						i++;
 					})
 					Object.freeze(header);
+					
 			
 					for (i = 1; i < rows.length; i++){
 			
@@ -112,7 +80,8 @@ let mainFunction1 = () => {
 							// console.log(file, " > ", "SeO", rows[i][header['Section officer name']], rows[i][header['Section officer E-mail']], rows[i][header['Section officer Mobile No.']] );
 							SeOobj.push({name:rows[i][header['Section officer name']],email:rows[i][header['Section officer E-mail']],phoneNo:rows[i][header['Section officer Mobile No.']],password:'$2a$10$Ytp/HET0w3BlKFggDcQ6uOXTdLFNNo11MLnrpEMUeMwuFwS0WhKoW',role:'Section Officer'});    
 						}
-			
+						// console.log(rows[i][header['Uniqe code']]);
+						console.log(rows[i][header['Uniqe code']])
 						uniCode_RoadName.push({road_code:rows[i][header['Uniqe code']],name:rows[i][header['Name of Road & chainage']]});
 						// if(rows[i][header['Uniqe code']]) {
 						// 	console.log(file, " > ", "Road : ", rows[i][header['Uniqe code']] );
@@ -140,8 +109,7 @@ let mainFunction1 = () => {
 					}
 			})
 			.catch(e => {
-				console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> Error File : ", file);
-				
+				console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> Error File : ", file, e);	
 				reject(e)
 			})
 		})
@@ -158,7 +126,7 @@ async function doAtEnd1() {
 		console.log("EE : ", EEobj.length);
 		console.log("SEO : ", SeOobj.length);
 		console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>");
-
+		// return
 		// await uniCode_RoadName.forEach(async road => {
 		// 	console.log("Road : ", road.road_code);
 		// })
@@ -461,10 +429,8 @@ async function doAtEnd3() {
 }
 
 //use mainFunction 1 or 2 or 3
-// mainFunction3()
-// 	.then(() => {
-// 		console.log("done");
-		
-// 		// doAtEnd1()
-// 	})
-// 	.catch(err => console.log(err))
+mainFunction3()
+	.then(() => {
+		// doAtEnd1()
+	})
+	.catch(err => console.log(err))

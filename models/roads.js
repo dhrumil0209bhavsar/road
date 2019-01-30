@@ -4,7 +4,8 @@ const mongoose = require('mongoose');
 const roadSchema = mongoose.Schema({
     road_code: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     name: {
         type: String,
