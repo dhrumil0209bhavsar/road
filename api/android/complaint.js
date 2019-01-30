@@ -73,6 +73,13 @@ router.post('/postNewComplaint', async (req, res) => {
             return;
         }       
 
+        function addDays(theDate, days) {
+            return new Date(theDate.getTime() + days*24*60*60*1000);
+        }
+
+        let grievance = await db.Grievance.findOne({ name: griev_type });
+        let estimated_date = addDays(new Date(), parseInt(grievance.duration));
+
         //creating new posted user
         let newPostedUser = new PostedUser({ userId: userId, url: url });
         
@@ -82,7 +89,9 @@ router.post('/postNewComplaint', async (req, res) => {
             name: name,
             location: [lon, lat],
             grievType: griev_type,
-            description: description });
+            description: description,
+            estimated_completion: estimated_date
+        });
 
         //find officer connected to perticular road by road code
         let officerObjectId = await getOfficerObjectByRoadCode(roadCode);
@@ -179,7 +188,7 @@ router.post('/postNewComplaint', async (req, res) => {
                             officer_id: officerObjectId,
                             officer_email: officer.email,
                             officer_name: officer.name,
-                            time: CONSTANTS.getFormatedDate(newPostedUser.time)
+                            complaint_upload_time: CONSTANTS.getFormatedDate(newPostedUser.time)
                         }
                         console.log("---------------------");
                         console.log("response");
@@ -235,7 +244,7 @@ router.post('/postNewComplaint', async (req, res) => {
                         officer_id: officerObjectId,
                         officer_email: officer.email,
                         officer_name: officer.name,
-                        time: CONSTANTS.getFormatedDate(complaint.time)
+                        complaint_upload_time: CONSTANTS.getFormatedDate(complaint.time)
                     }
                     await res.json(response);
                     //task after posting complaint (eg. notifications)
