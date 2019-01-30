@@ -77,8 +77,8 @@ router.post('/postNewComplaint', async (req, res) => {
             return new Date(theDate.getTime() + days*24*60*60*1000);
         }
 
-        let grievance = await db.Grievance.findOne({ name: griev_type });
-        let estimated_date = addDays(new Date(), parseInt(grievance.duration));
+        //let grievance = await db.Grievance.findOne({ name: griev_type });
+        //let estimated_date = addDays(new Date(), parseInt(grievance.duration));
 
         //creating new posted user
         let newPostedUser = new PostedUser({ userId: userId, url: url });
@@ -89,8 +89,8 @@ router.post('/postNewComplaint', async (req, res) => {
             name: name,
             location: [lon, lat],
             grievType: griev_type,
-            description: description,
-            estimated_completion: estimated_date
+            description: description
+            //estimated_completion: estimated_date
         });
 
         //find officer connected to perticular road by road code
