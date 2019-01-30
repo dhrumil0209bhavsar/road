@@ -14,5 +14,7 @@ module.exports = {
     PostedUser: require('./models/postedUser').PostedUser,
     RoadComplaint: require('./models/roadComplaint').RoadComplaint,
     UpdatedComplaint: require('./models/updatedComplaint').UpdatedComplaint,
-    Road: require('./models/roads').Road
+    Road: require('./models/roads').Road,
+    Grievance: require('./models/grievance').Grievance,
+    Rejection: require('./models/rejection').Rejection
 };

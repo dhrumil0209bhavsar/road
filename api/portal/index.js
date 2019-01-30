@@ -32,6 +32,7 @@ router.get('/testOfficers', async (req, res) => {
 
 
 router.use('/', require('./authenticate'));//login and signup officers
+router.use('/manage/', require('./grievanceAndRejection'));
 router.use('/', require('./hierarchy'));//some operations on hierarchy of officer
 router.use(verify);//jwt verification
 //Only officer or admin user can access links
