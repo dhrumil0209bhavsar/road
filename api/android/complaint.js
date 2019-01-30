@@ -188,7 +188,7 @@ router.post('/postNewComplaint', async (req, res) => {
                             officer_id: officerObjectId,
                             officer_email: officer.email,
                             officer_name: officer.name,
-                            complaint_upload_time: CONSTANTS.getFormatedDate(newPostedUser.time)
+                            complaint_upload_time: CONSTANTS.getFormatedDate(new Date())//newPostedUser.time)
                         }
                         console.log("---------------------");
                         console.log("response");
@@ -244,7 +244,7 @@ router.post('/postNewComplaint', async (req, res) => {
                         officer_id: officerObjectId,
                         officer_email: officer.email,
                         officer_name: officer.name,
-                        complaint_upload_time: CONSTANTS.getFormatedDate(complaint.time)
+                        complaint_upload_time: CONSTANTS.getFormatedDate(new Date())//complaint.time)
                     }
                     await res.json(response);
                     //task after posting complaint (eg. notifications)
