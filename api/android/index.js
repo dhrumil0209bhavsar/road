@@ -19,7 +19,7 @@ router.get('/getImage',async (req, res) => {
     }
 })
 
-router.use('/testing/', require('./roadTesting'));
+// router.use('/testing/', require('./roadTesting'));
 router.use('/', require('./androidTest')); //mock routes
 router.use('/', require('./otp')); //Otp routes
 
