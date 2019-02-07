@@ -160,7 +160,7 @@ router.post('/postNewComplaint', async (req, res) => {
                 console.log(complaints);
                 console.log("---------------------");
 
-                if(complaints.length > 1) {
+                if(complaints.length >= 1) {
                     let sortedComplaints = await complaints.sort((a, b) => {
                         return a.distance > b.distance
                     })
