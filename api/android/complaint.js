@@ -4,6 +4,7 @@ const CONSTANTS = require('../../globals').constants;
 const db = require('../../db');
 const PostedUser = require('../../models/postedUser').PostedUser;
 const mongoose = require('mongoose');
+const ObjectId = require('mongodb').ObjectID;
 
 let getOfficerById = async (officerObjectId, selectionValue) => {
     let getOfficerQuery = db.Officer.findOne({ _id: officerObjectId }).select(selectionValue);
@@ -125,7 +126,7 @@ router.post('/postNewComplaint', async (req, res) => {
         }
 
         //duplicate complaints here
-        await db.Officer.findOne({ "_id": officerObjectId })
+        await db.Officer.findOne({ "_id": ObjectId(officerObjectId) })
             .then(async data => {
                 let officer = data
                 // let complaints = await data.complaints.map(item => {
