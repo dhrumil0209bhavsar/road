@@ -157,10 +157,11 @@ router.post('/postNewComplaint', async (req, res) => {
 
                 console.log("---------------------");
                 console.log("filtered");
-                console.log(complaints);
+                console.log(complaints.length);
                 console.log("---------------------");
 
                 if(complaints.length >= 1) {
+                    console.log("Posting duplicate complaint");
                     let sortedComplaints = await complaints.sort((a, b) => {
                         return a.distance > b.distance
                     })
@@ -203,6 +204,7 @@ router.post('/postNewComplaint', async (req, res) => {
                     })
                     .catch(err => { console.log(err); res.json({ success: false, data: "Something went wrong here" }); return -1;});                    
                 } else  {
+                    console.log("Posting new complaint");
                     //adding officer id in users.complaintOfficer
                     await db.User.updateOne(
                         { _id: userId },
