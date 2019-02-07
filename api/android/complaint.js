@@ -128,7 +128,7 @@ router.post('/postNewComplaint', async (req, res) => {
         console.log("officer id", officerObjectId);
         console.log("Object ID ", officerObjectId);
         //duplicate complaints here
-        await db.Officer.findOne({ "_id": ObjectId(officerObjectId) })
+        await db.Officer.findOne({ "_id": ObjectId(officerObjectId.officer) })
             .then(async data => {
                 let officer = data
                 // let complaints = await data.complaints.map(item => {
