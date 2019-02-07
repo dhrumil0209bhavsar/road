@@ -211,7 +211,7 @@ router.post('/postNewComplaint', async (req, res) => {
                         { $addToSet: { "complaintOfficers": officerObjectId } })
                     .then(data =>{ 
                         if(data) { 
-                            // console.log("officer id added to user.complaintOfficers")
+                            console.log("0 officer id added to user.complaintOfficers")
                         } else { res.json({ success: false, data: "User does not exists, try clearing app data" }); return -1; }
                     })
                     .catch(err => { console.log(err); res.json({ success: false, data: "Something went wrong" }); return -1; });
@@ -222,7 +222,7 @@ router.post('/postNewComplaint', async (req, res) => {
                         { $push: { complaints: complaint }, //push new complaint in document
                         $inc: { newComplaints: 1, pending: 1 }, }) //increament new complaint counter
                         .then(data => { 
-                            // console.log("Complaint added to Officer's Complaints array"); 
+                            console.log("1 Complaint added to Officer's Complaints array"); 
                         })
                         .catch(err => { console.log(err); res.json({ success: false, data: "Something went wrong" }); return -1; });
 
@@ -231,7 +231,7 @@ router.post('/postNewComplaint', async (req, res) => {
                             { complaints: { $elemMatch: { "_id": complaint._id } } }] },
                             { $addToSet: { "complaints.$.postedUsers": newPostedUser } })
                         .then(data => { 
-                            // console.log(1); 
+                            console.log("2 posted user added"); 
                         })
                         .catch(err => { console.log(err); res.json({ success: false, data: "Something went wrong here" }); return -1;});
 
@@ -254,6 +254,7 @@ router.post('/postNewComplaint', async (req, res) => {
                         complaint_upload_time: CONSTANTS.getFormatedDate(new Date())//complaint.time)
                     }
                     await res.json(response);
+                    console.log("3 respone sent");
                     //task after posting complaint (eg. notifications)
                 }
             })
