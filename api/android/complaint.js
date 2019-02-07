@@ -200,7 +200,7 @@ router.post('/postNewComplaint', async (req, res) => {
                         console.log("response");
                         console.log(response);
                         console.log("---------------------");
-                        res.json(response); 
+                        res.status(200).json(response); 
                     })
                     .catch(err => { console.log(err); res.json({ success: false, data: "Something went wrong here" }); return -1;});                    
                 } else  {
