@@ -254,6 +254,7 @@ router.post('/postNewComplaint', async (req, res) => {
                         complaint_upload_time: CONSTANTS.getFormatedDate(new Date())//complaint.time)
                     }
                     await res.json(response);
+                    console.log("res", response);
                     console.log("3 respone sent");
                     //task after posting complaint (eg. notifications)
                 }
