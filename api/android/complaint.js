@@ -141,6 +141,8 @@ router.post('/postNewComplaint', async (req, res) => {
                 // console.log(complaints);
                 // console.log("---------------------");
                 
+                console.log("data", data);
+                
 
                 let complaints = await data.complaints.filter((item) => {
                     console.log("---------------------");
