@@ -34,9 +34,9 @@ constants = {
     getFormatedTime: (date) => {
         return (
         addZeros(date.getHours())
-        + ' : '
+        + ':'
         + addZeros(date.getMinutes()) 
-        + ' : ' 
+        + ':' 
         + addZeros(date.getSeconds())
         )
     },
