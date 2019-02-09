@@ -1,4 +1,4 @@
-function addZero(i) {
+function addZeros(i) {
   if (i < 10) {
     i = "0" + i;
   }
