@@ -1,3 +1,10 @@
+function addZero(i) {
+  if (i < 10) {
+    i = "0" + i;
+  }
+  return i;
+}
+
 constants = {
     HOST: "https://roadgrievance.herokuapp.com/",
     SECRET_KEY: 's9iIk0llo06TgfrTFDrfvHFKJbJBbvftrdFYT',
@@ -25,12 +32,13 @@ constants = {
          + ":" + date.getFullYear();
     },
     getFormatedTime: (date) => {
-        return ( 
-            (date.getDate() < 10) ? '0'+date.getDate() : date.getDate() 
-        ) 
-        + ":" + 
-        ( (date.getMonth() + 1) < 10 ? '0'+(date.getMonth() + 1) : (date.getMonth() + 1) )
-         + ":" + date.getFullYear();
+        return (
+        addZeros(date.getHours())
+        + ' : '
+        + addZeros(date.getMinutes()) 
+        + ' : ' 
+        + addZeros(date.getSeconds())
+        )
     },
     MIN_RADIUS: 500
 }
