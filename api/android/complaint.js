@@ -194,7 +194,8 @@ router.post('/postNewComplaint', async (req, res) => {
                             officer_id: String(officerObjectId.officer),
                             officer_email: officer.email,
                             officer_name: officer.name,
-                            complaint_upload_time: CONSTANTS.getFormatedDate(new Date())//newPostedUser.time)
+                            time: CONSTANTS.getFormatedDate(new Date()),//newPostedUser.time),
+                            complaint_upload_time: CONSTANTS.getFormatedTime(new Date())
                         }
                         console.log("---------------------");
                         console.log("response");
@@ -251,7 +252,8 @@ router.post('/postNewComplaint', async (req, res) => {
                         officer_id: String(officerObjectId.officer),
                         officer_email: officer.email,
                         officer_name: officer.name,
-                        complaint_upload_time: CONSTANTS.getFormatedDate(new Date())//complaint.time)
+                        time: CONSTANTS.getFormatedDate(new Date()),//newPostedUser.time),
+                        complaint_upload_time: CONSTANTS.getFormatedTime(new Date())
                     }
                     res.json(response);
                     console.log("res", response);
