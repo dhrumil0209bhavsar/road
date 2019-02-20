@@ -24,12 +24,13 @@ constants = {
     ],
     OTP_EXPIRATION: 120,
     getFormatedDate: (date) => {
-        return ( 
-            (date.getDate() < 10) ? '0'+date.getDate() : date.getDate() 
-        ) 
-        + ":" + 
-        ( (date.getMonth() + 1) < 10 ? '0'+(date.getMonth() + 1) : (date.getMonth() + 1) )
-         + ":" + date.getFullYear();
+        return (
+            addZeros(date.getDate())
+            + ':'
+            + addZeros(date.getMonth()) 
+            + ':' 
+            + addZeros(date.getFullYear())
+        );
     },
     getFormatedTime: (date) => {
         return (
