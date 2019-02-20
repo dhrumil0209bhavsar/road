@@ -4,6 +4,7 @@ const CONSTANTS = require('../../globals').constants;
 const db = require('../../db');
 const PostedUser = require('../../models/postedUser').PostedUser;
 const mongoose = require('mongoose');
+const ObjectId = require('mongodb').ObjectID;
 
 let getOfficerById = async (officerObjectId, selectionValue) => {
     let getOfficerQuery = db.Officer.findOne({ _id: officerObjectId }).select(selectionValue);
@@ -77,8 +78,8 @@ router.post('/postNewComplaint', async (req, res) => {
             return new Date(theDate.getTime() + days*24*60*60*1000);
         }
 
-        let grievance = await db.Grievance.findOne({ name: griev_type });
-        let estimated_date = addDays(new Date(), parseInt(grievance.duration));
+        //let grievance = await db.Grievance.findOne({ name: griev_type });
+        //let estimated_date = addDays(new Date(), parseInt(grievance.duration));
 
         //creating new posted user
         let newPostedUser = new PostedUser({ userId: userId, url: url });
@@ -89,8 +90,8 @@ router.post('/postNewComplaint', async (req, res) => {
             name: name,
             location: [lon, lat],
             grievType: griev_type,
-            description: description,
-            estimated_completion: estimated_date
+            description: description
+            //estimated_completion: estimated_date
         });
 
         //find officer connected to perticular road by road code
@@ -124,8 +125,10 @@ router.post('/postNewComplaint', async (req, res) => {
             }
         }
 
+        console.log("officer id", officerObjectId);
+        console.log("Object ID ", officerObjectId);
         //duplicate complaints here
-        await db.Officer.findOne({ "_id": officerObjectId })
+        await db.Officer.findOne({ "_id": ObjectId(officerObjectId.officer) })
             .then(async data => {
                 let officer = data
                 // let complaints = await data.complaints.map(item => {
@@ -141,6 +144,8 @@ router.post('/postNewComplaint', async (req, res) => {
                 // console.log(complaints);
                 // console.log("---------------------");
                 
+                console.log("data", data);
+                
 
                 let complaints = await data.complaints.filter((item) => {
                     console.log("---------------------");
@@ -152,10 +157,11 @@ router.post('/postNewComplaint', async (req, res) => {
 
                 console.log("---------------------");
                 console.log("filtered");
-                console.log(complaints);
+                console.log(complaints.length);
                 console.log("---------------------");
 
-                if(complaints.length > 1) {
+                if(complaints.length >= 1) {
+                    console.log("Posting duplicate complaint");
                     let sortedComplaints = await complaints.sort((a, b) => {
                         return a.distance > b.distance
                     })
@@ -185,26 +191,28 @@ router.post('/postNewComplaint', async (req, res) => {
                             name: finalComplaint.name,
                             griev_type: finalComplaint.grievType,
                             description: finalComplaint.description,
-                            officer_id: officerObjectId,
+                            officer_id: String(officerObjectId.officer),
                             officer_email: officer.email,
                             officer_name: officer.name,
-                            complaint_upload_time: CONSTANTS.getFormatedDate(newPostedUser.time)
+                            complaint_upload_date: CONSTANTS.getFormatedDate(new Date()),//newPostedUser.time),
+                            complaint_upload_time: CONSTANTS.getFormatedTime(new Date())
                         }
                         console.log("---------------------");
                         console.log("response");
                         console.log(response);
                         console.log("---------------------");
-                        res.json(response); 
+                        res.status(200).json(response); 
                     })
                     .catch(err => { console.log(err); res.json({ success: false, data: "Something went wrong here" }); return -1;});                    
                 } else  {
+                    console.log("Posting new complaint");
                     //adding officer id in users.complaintOfficer
                     await db.User.updateOne(
                         { _id: userId },
                         { $addToSet: { "complaintOfficers": officerObjectId } })
                     .then(data =>{ 
                         if(data) { 
-                            // console.log("officer id added to user.complaintOfficers")
+                            console.log("0 officer id added to user.complaintOfficers")
                         } else { res.json({ success: false, data: "User does not exists, try clearing app data" }); return -1; }
                     })
                     .catch(err => { console.log(err); res.json({ success: false, data: "Something went wrong" }); return -1; });
@@ -215,7 +223,7 @@ router.post('/postNewComplaint', async (req, res) => {
                         { $push: { complaints: complaint }, //push new complaint in document
                         $inc: { newComplaints: 1, pending: 1 }, }) //increament new complaint counter
                         .then(data => { 
-                            // console.log("Complaint added to Officer's Complaints array"); 
+                            console.log("1 Complaint added to Officer's Complaints array"); 
                         })
                         .catch(err => { console.log(err); res.json({ success: false, data: "Something went wrong" }); return -1; });
 
@@ -224,7 +232,7 @@ router.post('/postNewComplaint', async (req, res) => {
                             { complaints: { $elemMatch: { "_id": complaint._id } } }] },
                             { $addToSet: { "complaints.$.postedUsers": newPostedUser } })
                         .then(data => { 
-                            // console.log(1); 
+                            console.log("2 posted user added"); 
                         })
                         .catch(err => { console.log(err); res.json({ success: false, data: "Something went wrong here" }); return -1;});
 
@@ -241,12 +249,15 @@ router.post('/postNewComplaint', async (req, res) => {
                         name: complaint.name,
                         griev_type: complaint.grievType,
                         description: complaint.description,
-                        officer_id: officerObjectId,
+                        officer_id: String(officerObjectId.officer),
                         officer_email: officer.email,
                         officer_name: officer.name,
-                        complaint_upload_time: CONSTANTS.getFormatedDate(complaint.time)
+                        complaint_upload_date: CONSTANTS.getFormatedDate(new Date()),//newPostedUser.time),
+                        complaint_upload_time: CONSTANTS.getFormatedTime(new Date())
                     }
-                    await res.json(response);
+                    res.json(response);
+                    console.log("res", response);
+                    console.log("3 respone sent");
                     //task after posting complaint (eg. notifications)
                 }
             })
