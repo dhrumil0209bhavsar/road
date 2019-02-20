@@ -6,9 +6,6 @@ const ObjectId = require('mongodb').ObjectID;
 
 router
     .get('/grienvances', async (req, res) => {
-        db.Grievance.findOne({}, function(err, data) {
-            console.log(err, data);
-        })
         db.Grievance.find({})
             .then(data => {
                 res.json({
