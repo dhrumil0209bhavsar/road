@@ -1,66 +1,30 @@
 const mongoose = require('mongoose');
-const roadComplaintSchema = require('./roadComplaint').roadComplaintSchema;
+// const roadComplaintSchema = require('./roadComplaint').roadComplaintSchema;
 const mongoosePaginate = require('mongoose-paginate');
 
 const officer = mongoose.Schema({
-    name: {
-        type: String,
-        required: true
-    },
-    phoneNo: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    email: {
-        type: String,
-        required: true
-    },
-    password: {
-        type: String,
-        required: true
-    },
-    role: {
-        type: String,
-        enum: [
-            'Section Officer',
-            'Deputy Executive Engineer',
-            'Executive Engineer',
-            'Superintending Engineer',
-            'Chief Engineer',
-            'Admin'
-        ],
-        required: true
-    },
-    nextWarningDate: {
-        type: Date,
-        required: false
-    },
-    complaints: {
-        type: Array,
-        default: []
-    },
-    newComplaints: {
-        type: Number,
-        default: 0
-    },
-    pending: {
-        type: Number,
-        default: 0
-    },
-    emergency: {
-        type: Number,
-        default: 0
-    },
-    completed: {
-        type: Number,
-        default: 0
-    }
 
-}, {
-        timestamps: true
-    }
-);
+    //personal details
+    name:               { type: String, required: true },
+    phoneNo:            { type: String, required: true, unique: true },
+    email:              { type: String, required: true },
+    password:           { type: String, required: false, default: "$2a$10$Ytp/HET0w3BlKFggDcQ6uOXTdLFNNo11MLnrpEMUeMwuFwS0WhKoW", },
+    role:               { type: String, required: true, enum: [ 'Section Officer', 'Deputy Executive Engineer', 'Executive Engineer', 'Superintending Engineer', 'Chief Engineer', 'Admin' ] },
+    
+    //portal details
+    nextWarningDate:    { type: Date, required: false },
+    complaints:         { type: Array, default: [] },
+    newComplaints:      { type: Number, default: 0 },
+    pending:            { type: Number, default: 0 },
+    emergency:          { type: Number, default: 0 },
+    completed:          { type: Number, default: 0 },
+
+    //new fields
+    roadCode:               { type: String, required: true },
+    fileName:               { type: String, required: true },
+
+
+}, { timestamps: true });
 
 officer.index({ "complaints.location": "2dsphere" });
 officer.plugin(mongoosePaginate);

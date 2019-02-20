@@ -1,12 +1,10 @@
 //required imports
 const path = require('path');
 const express = require('express');
-const db = require('../../imageDb')
 const router = express.Router(); //get the express router
 const verify = require('../../middlewares/aurthorization').verify; //middleware to verify access token
 // const CONSTANTS = require('../../globals').constants; //global constants
 
-//Here are all routes of API
 //Here are all routes of API
 router.get('/getImage',async (req, res) => {
     res.setHeader("Content-type", "image/jpg");

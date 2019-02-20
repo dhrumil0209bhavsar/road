@@ -12,7 +12,12 @@ router.get('/newComplaintsCount', async (req, res) => {
         .then(data => {
             res.json({
                 success: true,
-                data: data.newComplaints
+                data: {
+                    newComplaints: data.newComplaints,
+                    completed: data.completed,
+                    emergency: data.emergency,
+                    pending: data.pending
+                }
             })
             return;
         })
