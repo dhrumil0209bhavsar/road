@@ -4,7 +4,7 @@ const PORT = process.env.PORT || 3003;
 const CONSTANTS = require('./globals').constants;
 
 mongoose.set('useCreateIndex', true);
-mongoose.connect("mongodb://localhost/roadGrievanceDB", { useNewUrlParser: true });
+mongoose.connect(CONSTANTS['mongoDBURL'], { useNewUrlParser: true });
 const db = mongoose.connection;
 mongoose.Promise = global.Promise;
 
