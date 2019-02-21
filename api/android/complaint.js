@@ -13,18 +13,14 @@ let getOfficerById = async (officerObjectId, selectionValue) => {
 }
 
 let getOfficerObjectByRoadCode = async (road_code) => {
-    console.log(road_code);
-    db.RoadToOfficer.findOne({ "road_code": road_code })
-        .then(data => {
-            console.log();
-            
-        })
     //find roadToOfficer entry for given road_code
     // let findOfficerToRoadCodeEntryQuery = 
     // let findOfficerToRoadCodeEntryResult = await db.RoadToOfficer.findOne({ road_code: road_code });
     // if(findOfficerToRoadCodeEntryResult != null)
     //     return findOfficerToRoadCodeEntryResult.officer;
-    return await db.RoadToOfficer.findOne({ "road_code": road_code });
+    let obj = await db.RoadToOfficer.findOne({ "road_code": road_code });
+    obj._id = obj.officer;
+    return obj;
 }
 
 let userIsValid = async userId => {
@@ -173,7 +169,7 @@ router.post('/postNewComplaint', async (req, res) => {
                     console.log(finalComplaint);
                     console.log("---------------------");
 
-                    await db.Officer.updateOne({ $and: [{ _id: officerObjectId },
+                    await db.Officer.updateOne({ $and: [{ _id: ObjectId(officerObjectId) },
                         { complaints: { $elemMatch: { "_id": finalComplaint._id } } }] },
                         { $addToSet: { "complaints.$.postedUsers": newPostedUser },
                           $inc: { newComplaints: 1 }
@@ -218,10 +214,12 @@ router.post('/postNewComplaint', async (req, res) => {
                     .catch(err => { console.log(err); res.json({ success: false, data: "Something went wrong" }); return -1; });
 
                     //saving road complaint to officer
+                    console.log("Officer", officerObjectId._id, ObjectId(officerObjectId._id));
+                    
                     await db.Officer.updateOne(
-                        { _id: officerObjectId }, //find officer document
+                        { _id: ObjectId(officerObjectId._id) }, //find officer document
                         { $push: { complaints: complaint }, //push new complaint in document
-                        $inc: { newComplaints: 1, pending: 1 }, }) //increament new complaint counter
+                        $inc: { newComplaints: 1, pending: 1, total: 1 }, }) //increament new complaint counter
                         .then(data => { 
                             console.log("1 Complaint added to Officer's Complaints array");
                             console.log("Data : ", data); 

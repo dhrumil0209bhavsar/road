@@ -14,10 +14,12 @@ const officer = mongoose.Schema({
     //portal details
     nextWarningDate:    { type: Date, required: false },
     complaints:         { type: Array, default: [] },
+    total:              { type: Number, default: 0 },
     newComplaints:      { type: Number, default: 0 },
     pending:            { type: Number, default: 0 },
     emergency:          { type: Number, default: 0 },
     completed:          { type: Number, default: 0 },
+    isUpdated:          { type: Boolean, default: false },
 
     //new fields
     roadCode:               { type: String, required: true },
