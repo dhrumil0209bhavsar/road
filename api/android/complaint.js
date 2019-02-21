@@ -223,7 +223,8 @@ router.post('/postNewComplaint', async (req, res) => {
                         { $push: { complaints: complaint }, //push new complaint in document
                         $inc: { newComplaints: 1, pending: 1 }, }) //increament new complaint counter
                         .then(data => { 
-                            console.log("1 Complaint added to Officer's Complaints array"); 
+                            console.log("1 Complaint added to Officer's Complaints array");
+                            console.log("Data : ", data); 
                         })
                         .catch(err => { console.log(err); res.json({ success: false, data: "Something went wrong" }); return -1; });
 
