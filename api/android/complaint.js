@@ -279,7 +279,7 @@ router.get('/notifications', async (req, res) => {
         .then(async data => {         
             res.json({
                 notifications: data.updatedComplaints,
-                isGrievUpdated: CONSTANTS.isUpdated
+                lastGrievUpdatedDate: CONSTANTS.isUpdated
             });
             await db.User.updateOne(
                 { "_id": mongoose.Types.ObjectId(req.userData._id) },
