@@ -61,6 +61,7 @@ router.post('/updateProfile', async (req, res) => {
                         email: req.body.email,
                         phoneNo: req.body.phoneNo,
                         password: req.body.newPassword === "" ? data.password : bcrypt.hashSync(req.body.newPassword, 10),
+                        isUpdated: true
                     })
                     .then(data => {
                         res.json({

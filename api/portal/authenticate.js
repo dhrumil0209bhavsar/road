@@ -40,7 +40,7 @@ router.post('/login', (req, res) => {
                 };
 
                 let loginType = data.role === 'Admin' ? 'admin' : 'officer'
-                sendUserToken(req, res, user, loginType, data.role);
+                sendUserToken(req, res, user, loginType, data.role, data.isUpdated);
             } else {
                 res.json({
                     success: false,
@@ -58,7 +58,7 @@ router.post('/login', (req, res) => {
 });
 
 // generating token
-let sendUserToken = (req, res, data, loginType, officerRole) => {
+let sendUserToken = (req, res, data, loginType, officerRole, isUpdated) => {
     //let isUser = isNewUser;
     jwt.sign(data, CONSTANTS['SECRET_KEY'], (err, token) => {
         if (err) {
@@ -73,7 +73,8 @@ let sendUserToken = (req, res, data, loginType, officerRole) => {
                 success: true,
                 data: token,
                 role: officerRole,
-                loginType: loginType
+                loginType: loginType,
+                isUpdated
             });
         }
     });
