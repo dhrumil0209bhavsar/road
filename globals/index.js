@@ -42,7 +42,7 @@ constants = {
         )
     },
     MIN_RADIUS: 500,
-    isUpdated: new Date()
+    isUpdated: (new Date()).getTime()
 }
 
 

@@ -230,6 +230,7 @@ router.get('/getAllJrIds', async (req, res) => {
                     "newComplaints": 1, "pending": 1, "emergency": 1, "completed": 1, "total": 1
                 })
                 .then(data => {
+                    console.log(data);
                     officerWithData.push(data);
                 }));
         })
