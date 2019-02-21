@@ -225,7 +225,10 @@ router.get('/getAllJrIds', async (req, res) => {
         let promises = [];
         let mp = await officers.forEach(officer => {
             promises.push(db.Officer.findOne({ _id: mongoose.Types.ObjectId(officer) })
-                .select({ "_id": 1, "name": 1, "email": 1, "phoneNo": 1, "role": 1 })
+                .select({ 
+                    "_id": 1, "name": 1, "email": 1, "phoneNo": 1, "role": 1,
+                    "newComplaints": 1, "pending": 1, "emergency": 1, "completed": 1
+                })
                 .then(data => {
                     officerWithData.push(data);
                 }));

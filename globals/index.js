@@ -41,12 +41,11 @@ constants = {
         + addZeros(date.getSeconds())
         )
     },
-    MIN_RADIUS: 500
+    MIN_RADIUS: 500,
+    isUpdated: new Date()
 }
 
 
 module.exports = {
     constants
 }
-
-

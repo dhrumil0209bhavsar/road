@@ -278,7 +278,10 @@ router.post('/postNewComplaint', async (req, res) => {
 router.get('/notifications', async (req, res) => {
     await db.User.findOne({ "_id" : mongoose.Types.ObjectId(req.userData._id)}).lean()
         .then(async data => {         
-            res.json(data.updatedComplaints);
+            res.json({
+                notifications: data.updatedComplaints,
+                isGrievUpdated: CONSTANTS.isUpdated
+            });
             await db.User.updateOne(
                 { "_id": mongoose.Types.ObjectId(req.userData._id) },
                 { "$set" : { "updatedComplaints": [] } }

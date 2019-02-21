@@ -3,6 +3,7 @@ const router = express.Router();
 // const mongoose = require('mongoose');
 const db = require('../../db');
 const ObjectId = require('mongodb').ObjectID;
+const CONSTANTS = require('../../globals').constants;
 
 router
     .get('/grienvances', async (req, res) => {
@@ -32,8 +33,7 @@ router
     
             grienvance.save()
                 .then(data => {
-                    console.log(data);
-                    
+                    CONSTANTS.isUpdated = new Date();
                     res.json({
                         success: true,
                         data: "done"
@@ -63,6 +63,7 @@ router
                 { _id: ObjectId(req.body._id) },
                 { name: req.body.name, duration: parseInt(req.body.duration) })
                 .then(data => {
+                    CONSTANTS.isUpdated = new Date();
                     res.json({
                         success: true,
                         data: data
@@ -91,6 +92,7 @@ router
             db.Grievance.findOneAndDelete(
                 { _id: ObjectId(req.body._id) })
                 .then(data => {
+                    CONSTANTS.isUpdated = new Date();
                     res.json({
                         success: true,
                         data: data

@@ -3,7 +3,7 @@ const path = require('path');
 const express = require('express');
 const router = express.Router(); //get the express router
 const verify = require('../../middlewares/aurthorization').verify; //middleware to verify access token
-// const CONSTANTS = require('../../globals').constants; //global constants
+const CONSTANTS = require('../../globals').constants; //global constants
 
 //Here are all routes of API
 router.get('/getImage',async (req, res) => {
@@ -15,6 +15,12 @@ router.get('/getImage',async (req, res) => {
         res.sendStatus(404);
         return;
     }
+});
+
+router.get('/this/this/', (req, res) => {
+    res.json({
+        isUpdated: CONSTANTS.isUpdated
+    })
 })
 
 // router.use('/testing/', require('./roadTesting'));
