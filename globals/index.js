@@ -8,10 +8,10 @@ function addZeros(i) {
 constants = {
     HOST: "https://roadgrievance.herokuapp.com/",
     SECRET_KEY: 's9iIk0llo06TgfrTFDrfvHFKJbJBbvftrdFYT',
-    mongoDBURL: 'mongodb://road123:road123@ds113443.mlab.com:13443/roadgrievancedb',
+    // mongoDBURL: 'mongodb://road123:road123@ds113443.mlab.com:13443/roadgrievancedb',
     // mongoDBURL: 'mongodb://kaushik:123456@localhost:27017/roadGrievanceDB',
     // mongoImage: 'mongodb://road123:road123@ds135724.mlab.com:35724/roadgrievancedb',
-    // mongoDBURL: 'mongodb://new_files:new_files07@ds147190.mlab.com:47190/new_files07',
+    mongoDBURL: 'mongodb+srv://road123:road123@kaushikcluster-htinl.mongodb.net/roadgrievancedb?retryWrites=true',
     // mongoMlabURL: 'mongodb://roadImage@r0adImage@ds037468.mlab.com:37468/image_cdn',
     // mongoDBURL: 'mongodb://localhost/roadGrievanceDB',
     // mongoDBURL: 'mongodb://kaushik:kaushik1@ds113443.mlab.com:13443/roadgrievancedb',
