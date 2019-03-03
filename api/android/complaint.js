@@ -54,7 +54,7 @@ router.post('/postNewComplaint', async (req, res) => {
             let lon = parseFloat(location[1]);
         let description = req.body.description;
         let griev_type = req.body.griev_type;
-        let url = CONSTANTS.HOST + "api/android/getImage?url=" + req.body.url;
+        let url = "https://imagescdn.herokuapp.com/" + req.body.url;
 
         //get user id from token
         let userId = req.userData._id;
